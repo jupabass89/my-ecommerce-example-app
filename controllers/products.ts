@@ -1,16 +1,16 @@
-const Product = require("./../models/product");
 import { NextFunction, Request, Response } from "express";
+import AppError from "../core/custom-error";
+
+const Product = require("./../models/product");
 
 const getProducts = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const products = await Product.find();
     if (!products.length) {
-      throw new Error();
+      throw new AppError("List of products can't be reached.", 400);
     }
     res.status(200).send(products);
-  } catch (error: any) {
-    error.customMessage = "List of products can't be reached.";
-    error.statusCode = 500;
+  } catch (error: unknown) {
     next(error);
   }
 };
@@ -20,12 +20,10 @@ const getProduct = async (req: Request, res: Response, next: NextFunction) => {
     const prodId = req.params.id;
     const product = await Product.findOne({ _id: prodId });
     if (!product) {
-      throw new Error();
+      throw new AppError("Product can't be reached.", 402);
     }
     res.status(200).send(product);
-  } catch (error: any) {
-    error.customMessage = "Product can't be reached.";
-    error.statusCode = 500;
+  } catch (error: unknown) {
     next(error);
   }
 };
@@ -37,13 +35,11 @@ const postProduct = async (req: Request, res: Response, next: NextFunction) => {
     const prodInserted = await newProd.save();
 
     if (!prodInserted) {
-      throw new Error();
+      throw new AppError("Product can't be created.", 403);
     }
 
     res.status(200).send(prodInserted);
-  } catch (error: any) {
-    error.customMessage = "Product can't be created.";
-    error.statusCode = 500;
+  } catch (error: unknown) {
     next(error);
   }
 };
@@ -57,13 +53,11 @@ const putProduct = async (req: Request, res: Response, next: NextFunction) => {
     );
 
     if (!prodReplaced) {
-      throw new Error();
+      throw new AppError("Product can't be replaced.", 404);
     }
 
     res.status(200).send(prodReplaced);
-  } catch (error: any) {
-    error.customMessage = "Product can't be replaced.";
-    error.statusCode = 500;
+  } catch (error: unknown) {
     next(error);
   }
 };
@@ -78,12 +72,10 @@ const patchProduct = async (
     const prodUpodated = await Product.updateOne({ _id: id }, { title, price });
 
     if (!prodUpodated) {
-      throw new Error();
+      throw new AppError("Product can't be updated.", 500);
     }
     res.status(200).send(prodUpodated);
-  } catch (error: any) {
-    error.customMessage = "Product can't be updated.";
-    error.statusCode = 500;
+  } catch (error: unknown) {
     next(error);
   }
 };
@@ -98,12 +90,10 @@ const deleteProduct = async (
     const deletedProduct = await Product.deleteOne({ _id: prodId });
 
     if (!deletedProduct) {
-      throw new Error();
+      throw new AppError("Product can't be deleted.", 506);
     }
     return res.status(200).send({ deleted: deletedProduct });
-  } catch (error: any) {
-    error.customMessage = "Product can't be deleted.";
-    error.statusCode = 500;
+  } catch (error: unknown) {
     next(error);
   }
 };
