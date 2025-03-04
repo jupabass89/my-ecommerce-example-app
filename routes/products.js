@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const {
   getProducts,
+  getProduct,
   postProduct,
   putProduct,
   patchProduct,
@@ -10,6 +11,9 @@ const {
 
 /* GET products. */
 router.get("/", getProducts);
+
+/* GET product. */
+router.get("/:id", getProduct);
 
 /* POST product */
 router.post("/", postProduct);
