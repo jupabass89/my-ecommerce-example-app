@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 /**
  * Module dependencies.
  */
-const app = require("../app");
+const app = require("../src/app");
 const debug = require("debug")("my-ecommerce-example-app:server");
 const http = require("http");
 
