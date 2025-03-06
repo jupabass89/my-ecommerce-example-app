@@ -1,5 +1,7 @@
 #!/usr/bin/env node
+require("dotenv").config();
 const mongoose = require("mongoose");
+const MONGO_URI = process.env.MONGO_URI;
 
 /**
  * Module dependencies.
@@ -23,9 +25,7 @@ const server = http.createServer(app);
  * Listen on provided port, on all network interfaces.
  */
 (async () => {
-  const connection = await mongoose.connect(
-    "mongodb+srv://jupabass89:qeNxX4dZpDzKLjzv@my-commerce-test-app.ommwn.mongodb.net/?retryWrites=true&w=majority&appName=my-commerce-test-app"
-  );
+  const connection = await mongoose.connect(MONGO_URI);
   if (connection) {
     server.listen(port);
     server.on("error", onError);
