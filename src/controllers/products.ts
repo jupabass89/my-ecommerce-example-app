@@ -10,7 +10,7 @@ const getProducts = async (req: Request, res: Response, next: NextFunction) => {
       throw new AppError("List of products can't be reached.", 400);
     }
     res.status(200).send(products);
-  } catch (error: unknown) {
+  } catch (error) {
     next(error);
   }
 };
@@ -20,10 +20,10 @@ const getProduct = async (req: Request, res: Response, next: NextFunction) => {
     const prodId = req.params.id;
     const product = await Product.findOne({ _id: prodId });
     if (!product) {
-      throw new AppError("Product can't be reached.", 402);
+      throw new AppError("Product dont exist.", 402);
     }
     res.status(200).send(product);
-  } catch (error: unknown) {
+  } catch (error) {
     next(error);
   }
 };
@@ -39,7 +39,7 @@ const postProduct = async (req: Request, res: Response, next: NextFunction) => {
     }
 
     res.status(200).send(prodInserted);
-  } catch (error: unknown) {
+  } catch (error) {
     next(error);
   }
 };
@@ -57,7 +57,7 @@ const putProduct = async (req: Request, res: Response, next: NextFunction) => {
     }
 
     res.status(200).send(prodReplaced);
-  } catch (error: unknown) {
+  } catch (error) {
     next(error);
   }
 };
@@ -75,7 +75,7 @@ const patchProduct = async (
       throw new AppError("Product can't be updated.", 500);
     }
     res.status(200).send(prodUpodated);
-  } catch (error: unknown) {
+  } catch (error) {
     next(error);
   }
 };
@@ -93,14 +93,14 @@ const deleteProduct = async (
       throw new AppError("Product can't be deleted.", 506);
     }
     return res.status(200).send({ deleted: deletedProduct });
-  } catch (error: unknown) {
+  } catch (error) {
     next(error);
   }
 };
 
-exports.getProducts = getProducts;
-exports.getProduct = getProduct;
-exports.postProduct = postProduct;
 exports.putProduct = putProduct;
+exports.getProduct = getProduct;
+exports.getProducts = getProducts;
+exports.postProduct = postProduct;
 exports.patchProduct = patchProduct;
 exports.deleteProduct = deleteProduct;

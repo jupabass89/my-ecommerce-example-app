@@ -5,6 +5,8 @@ const express = require("express");
 const path = require("path");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
+const multer = require("multer");
+const upload = multer({ dest: "uploads/" });
 
 // Import routes
 const indexRouter = require("./routes/index");
@@ -20,8 +22,12 @@ app.set("view engine", "ejs");
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+// app.use(express.)
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+
+// File handling
+app.use("/", upload.single("file"));
 
 // Adding routes
 app.use("/", indexRouter);
@@ -33,15 +39,13 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next(createError(404));
 });
 
-// Error handler
-app.use((error: any, req: Request, res: Response) => {
-  // set locals, only providing error in development
-  // res.locals.message = err.message;
-  // res.locals.error = req.app.get("env") === "development" ? err : {};
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+  console.error(err.stack); // ✅ Log error for debugging
+  const statusCode = err?.statusCode || 500;
 
-  res
-    .status(error.statusCode || 500)
-    .send({ message: error.customMessage, error });
+  res.status(statusCode).send({
+    error: err.message || "Internal Server Error",
+  });
 });
 
 module.exports = app;
