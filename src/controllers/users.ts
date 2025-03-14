@@ -1,15 +1,49 @@
 import { NextFunction, Request, Response } from "express";
 import AppError from "../core/custom-error";
 
+const bcrypt = require("bcrypt");
 const path = require("path");
 
 const User = require("./../models/user");
+
+const postLogin = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email: email });
+    if (!user) {
+      throw new AppError("User dont exist.", 401);
+    }
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordCorrect) {
+      throw new AppError("Password incorrect.", 401);
+    }
+    res.status(200).send({ message: "You are LogedIn!" });
+  } catch (error: unknown) {
+    next(error);
+  }
+};
+
+const getUserInfo = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.params.userId;
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new AppError("User can't be reached.", 400);
+    }
+    const { name, email, cart } = user;
+    const showUser = { name, email, cart };
+    res.status(200).send(showUser);
+  } catch (error: unknown) {
+    next(error);
+  }
+};
 
 const getUsers = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const users = await User.find();
     if (!users.length) {
-      throw new AppError("List of products can't be reached.", 400);
+      throw new AppError("List of users can't be reached.", 400);
     }
     res.status(200).send(users);
   } catch (error: unknown) {
@@ -29,8 +63,8 @@ const postUser = async (req: Request, res: Response, next: NextFunction) => {
     if (prevUser) {
       throw new AppError("El usuario ya existe.", 200);
     }
-
-    const user = new User(postUser);
+    const hashedPass = await bcrypt.hash(postUser.password, 12);
+    const user = new User({ ...postUser, password: hashedPass });
     const userAdded = await user.save();
 
     if (!userAdded) {
@@ -115,8 +149,10 @@ const getDocument = async (
   }
 };
 
+exports.postLogin = postLogin;
 exports.getUsers = getUsers;
 exports.postUser = postUser;
 exports.patchCart = patchCart;
+exports.getUserInfo = getUserInfo;
 exports.getDocument = getDocument;
 exports.patchtDocument = patchtDocument;
